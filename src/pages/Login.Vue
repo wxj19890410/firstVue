@@ -48,9 +48,6 @@ export default {
   },
   mounted () {
     this.showLogin = true
-    if (!this.adminInfo.id) {
-      // this.getAdminData()
-    }
   },
   computed: {
 
@@ -59,7 +56,7 @@ export default {
     async submitForm (formName) {
       this.$refs[formName].validate(async (valid) => {
         if (valid) {
-          this.$http.post('/user/loadInfo', {id: 2}).then(({ data }) => {
+          this.$http.get('/user/loadInfo', {id: 2}).then(({ data }) => {
             if (data) {
               this.$message({
                 type: 'success',
