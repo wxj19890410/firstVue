@@ -1,19 +1,25 @@
 <template>
-	<div class="manage_page fillcontain">
+	<el-form class="manage_page fillcontain">
 		<el-row style="height: 100%;">
 	  		<el-col :span="4"  style="min-height: 100%; background-color: #324057;">
-               <el-menu :default-active="defaultActive" style="min-height: 100%"theme="dark" router>
+          <el-menu :default-active="defaultActive" style="min-height: 100%"theme="dark" router>
 					<el-menu-item index="manage"><i class="el-icon-menu"></i>首页</el-menu-item>
 					<el-submenu index="2">
 						<template slot="title"><i class="el-icon-document"></i>数据管理</template>
 						<el-menu-item index="addData">添加数据</el-menu-item>
 					</el-submenu>
 					<el-submenu index="3">
+						<template slot="title"><i class="el-icon-plus"></i>管理</template>
+						<el-menu-item index="login">组织管理</el-menu-item>
+						<el-menu-item index="login">部门管理</el-menu-item>
+						<el-menu-item index="login">人员管理</el-menu-item>
+					</el-submenu>
+					<el-submenu index="4">
 						<template slot="title"><i class="el-icon-plus"></i>历史纪录</template>
 						<el-menu-item index="login">历史Excel</el-menu-item>
 						<el-menu-item index="login">添加商品</el-menu-item>
 					</el-submenu>
-					<el-submenu index="6">
+					<el-submenu index="5">
 						<template slot="title"><i class="el-icon-setting"></i>设置</template>
 						<el-menu-item index="login">管理员设置</el-menu-item>
 						<el-menu-item index="login">个人信息</el-menu-item>
@@ -27,23 +33,19 @@
 				</keep-alive>
 			</el-col>
 		</el-row>
-  	</div>
+  </el-form>
 </template>
 
 <script>
-    export default {
-		computed: {
-			defaultActive: function(){
-				return this.$route.path.replace('/', '');
-			}
-		},
+export default {
+  computed: {
+    defaultActive: function () {
+      return this.$route.path.replace('/', '')
     }
+  }
+}
 </script>
 
-
 <style lang="less" scoped>
-	@import '../style/mixin';
-	.manage_page{
-		
-	}
+@import '../style/mixin';
 </style>

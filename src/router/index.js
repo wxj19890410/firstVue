@@ -19,7 +19,7 @@ export default new Router({
       children: [{
         path: '',
         component: AddData,
-        meta: [],
+        meta: []
       }, {
         path: '/addData',
         component: AddData
