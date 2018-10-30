@@ -56,12 +56,14 @@ export default {
     async submitForm (formName) {
       this.$refs[formName].validate(async (valid) => {
         if (valid) {
-          this.$http.get('/user/loadInfo', {id: 2}).then(({ data }) => {
+          this.$http.post('/login/loadInfo', {account: 'admin', password: '123456'}).then(({ data }) => {
             if (data) {
               this.$message({
                 type: 'success',
                 message: '登录成功'
               })
+              this.$store.commit('setUserInfo', data)
+              this.$service.localStorage.save('loginUuid', data.loginUuid)
               this.$router.push('manage')
             } else {
               this.$message({

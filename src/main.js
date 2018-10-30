@@ -3,9 +3,11 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+import store from './vuex/index.js'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-default/index.css'
 import VueResource from 'vue-resource'
+import service from './service/index.js'
 
 Vue.config.productionTip = false
 
@@ -14,10 +16,11 @@ Vue.use(ElementUI, {
 })
 Vue.use(VueResource)
 
+Vue.prototype.$service = service
 Vue.http.options.emulateJSON = true
 Vue.http.interceptors.push((request, next) => {
   request.url = window.GLOBLE.apiUrl + request.url
-  console.log(request.url)
+  request.headers.set('loginUuid', service.localStorage.get('loginUuid'))
   if (request.method === 'POST' && request.body) {
     var params = {}
 
@@ -32,7 +35,6 @@ Vue.http.interceptors.push((request, next) => {
     }
     request.body = params
   }
-
   next(response => {
     let result = {
       ok: true
@@ -40,7 +42,14 @@ Vue.http.interceptors.push((request, next) => {
     if (response.status === 200 && !response.body.error) {
       result.data = response.body
     } else {
-      if (response.body && response.body.error) {
+      if (response.body.message === 'NotLogedInException') {
+        this.$message({
+          type: 'false',
+          message: '请登录用户'
+        })
+        store.commit('setUserInfo')
+        router.push('/login')
+      } else if (response.body.message) {
         result.error = response.body.error
         result.message = response.body.message
       }
@@ -53,6 +62,7 @@ Vue.http.interceptors.push((request, next) => {
 new Vue({
   el: '#app',
   router,
+  store,
   components: { App },
   template: '<App/>'
 })
