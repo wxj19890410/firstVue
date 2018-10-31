@@ -1,37 +1,178 @@
 <template>
-<div>
-  <el-row style="margin-top: 20px;">
-		<el-col :span="14" :offset="4">
-			<header class="form_header">添加食品</header>
-			<el-form  label-width="110px" class="form food_form">
-				<el-form-item label="上传食品图片">
-					<el-upload
-					  class="avatar-uploader"
-					  :action="uploadUrl"
-					  :show-file-list="false"
-					  :on-success="uploadImg"
-            :headers="headers"
-					  :before-upload="beforeImgUpload">
-					  <i>上传图片</i>
-					</el-upload>
-				</el-form-item>
-				<el-form-item>
-					<el-button type="primary" @click="addFood()">确认数据</el-button>
-				</el-form-item>
-			</el-form>
-		</el-col>
-	</el-row>
-</div>
+  <div>
+    <el-row style="margin-top: 20px;">
+  		<el-col :span="14" :offset="4">
+  			<header class="form_header">添加数据</header>
+  			<el-form  label-width="110px" class="form food_form">
+  				<el-form-item label="上传Excel">
+  					<el-upload
+  					  class="avatar-uploader"
+  					  :action="uploadUrl"
+  					  :show-file-list="false"
+  					  :on-success="uploadImg"
+              :headers="headers"
+  					  :before-upload="beforeImgUpload">
+  					  <i>上传图片</i>
+  					</el-upload>
+  				</el-form-item>
+          <el-form-item label="列表数据">
+            <el-select v-model="activityValue" @change="selectActivity" :placeholder="activityValue">
+                <el-option
+                    v-for="item in options"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
+                </el-option>
+            </el-select>
+            <el-button type="primary" @click="addFood()">原数据计算</el-button>
+  					<el-button type="primary" @click="addFood()">推送消息</el-button>
+  				</el-form-item>
+  			</el-form>
+  		</el-col>
+  	</el-row>
+    <div class="fillcontain">
+        <div class="table_container" v-show = "activityValue==='0'">
+            <el-table
+                :data="tableData"
+                style="width: 100%">
+                <el-table-column type="expand">
+                  <template slot-scope="props">
+                    <el-form label-position="left" inline class="demo-table-expand">
+                      <el-form-item label="店铺名称">
+                        <span>{{ props.row.name }}</span>
+                      </el-form-item>
+                      <el-form-item label="店铺地址">
+                        <span>{{ props.row.address }}</span>
+                      </el-form-item>
+                      <el-form-item label="店铺介绍">
+                        <span>{{ props.row.description }}</span>
+                      </el-form-item>
+                      <el-form-item label="店铺 ID">
+                        <span>{{ props.row.id }}</span>
+                      </el-form-item>
+                      <el-form-item label="联系电话">
+                        <span>{{ props.row.phone }}</span>
+                      </el-form-item>
+                      <el-form-item label="评分">
+                        <span>{{ props.row.rating }}</span>
+                      </el-form-item>
+                      <el-form-item label="销售量">
+                        <span>{{ props.row.recent_order_num }}</span>
+                      </el-form-item>
+                      <el-form-item label="分类">
+                        <span>{{ props.row.category }}</span>
+                      </el-form-item>
+                    </el-form>
+                  </template>
+                </el-table-column>
+                <el-table-column
+                  label="店铺名称"
+                  prop="name">
+                </el-table-column>
+                <el-table-column
+                  label="店铺地址"
+                  prop="address">
+                </el-table-column>
+                <el-table-column
+                  label="店铺介绍"
+                  prop="description">
+                </el-table-column>
+            </el-table>
+            <div class="Pagination">
+                <el-pagination
+                  @size-change="handleSizeChange"
+                  @current-change="handleCurrentChange"
+                  :current-page="currentPage"
+                  :page-size="20"
+                  layout="total, prev, pager, next"
+                  :total="count">
+                </el-pagination>
+            </div>
+        </div>
+        <div class="table_container" v-show = "activityValue==='1'">
+            <el-table
+                :data="tableData"
+                style="width: 100%">
+                <el-table-column type="expand">
+                  <template slot-scope="props">
+                    <el-form label-position="left" inline class="demo-table-expand">
+                      <el-form-item label="店铺名称">
+                        <span>{{ props.row.name }}</span>
+                      </el-form-item>
+                      <el-form-item label="店铺地址">
+                        <span>{{ props.row.address }}</span>
+                      </el-form-item>
+                      <el-form-item label="店铺介绍">
+                        <span>{{ props.row.description }}</span>
+                      </el-form-item>
+                      <el-form-item label="店铺 ID">
+                        <span>{{ props.row.id }}</span>
+                      </el-form-item>
+                      <el-form-item label="联系电话">
+                        <span>{{ props.row.phone }}</span>
+                      </el-form-item>
+                      <el-form-item label="评分">
+                        <span>{{ props.row.rating }}</span>
+                      </el-form-item>
+                      <el-form-item label="销售量">
+                        <span>{{ props.row.recent_order_num }}</span>
+                      </el-form-item>
+                      <el-form-item label="分类">
+                        <span>{{ props.row.category }}</span>
+                      </el-form-item>
+                    </el-form>
+                  </template>
+                </el-table-column>
+                <el-table-column
+                  label="店铺名称2"
+                  prop="name">
+                </el-table-column>
+                <el-table-column
+                  label="店铺地址2"
+                  prop="address">
+                </el-table-column>
+                <el-table-column
+                  label="店铺介绍3"
+                  prop="description">
+                </el-table-column>
+            </el-table>
+            <div class="Pagination">
+                <el-pagination
+                  @size-change="handleSizeChange"
+                  @current-change="handleCurrentChange"
+                  :current-page="currentPage"
+                  :page-size="20"
+                  layout="total, prev, pager, next"
+                  :total="count">
+                </el-pagination>
+            </div>
+        </div>
+    </div>
+  </div>
 </template>
 
 <script>
 export default {
   data () {
     return {
-	 uploadUrl: window.GLOBLE.apiUrl + '/file/upload',
+	    uploadUrl: window.GLOBLE.apiUrl + '/file/upload',
       headers: {
         loginUuid: this.$service.localStorage.get('loginUuid')
-      }
+      },
+      options: [{
+          value: '0',
+          label: '原数据'
+      }, {
+          value: '1',
+          label: '最终数据'
+      }],
+      activityValue: '0',
+      sysFile: null,
+      offset: 0,
+      count: 0,
+      tableData: [],
+      currentPage: 1,
+      selectTable: {}
     }
   },
   components: {
@@ -40,6 +181,30 @@ export default {
     this.initData()
   },
   methods: {
+    getResturants() {
+      const params = {}
+      params.month = this.sysFile.month
+      params.fileId = this.sysFile.id
+      //展示源数据
+      this.$http.get('/data/findOriginal', {params: params}).then(({ data }) => {
+        if (data) {
+          console.log(data)
+        } else {
+          this.$message({
+            type: 'error',
+            message: data.message
+          })
+        }
+      })
+    },
+    handleSizeChange (val) {
+      console.log(`每页 ${val} 条`)
+    },
+    handleCurrentChange (val) {
+      this.currentPage = val
+      this.offset = (val - 1) * this.limit
+      this.getResturants()
+    },
     initData () {
       try {
         //
@@ -48,8 +213,9 @@ export default {
       }
     },
     uploadImg (res, file) {
-      if (res.status === 1) {
-
+      if (res.id) {
+        this.sysFile = res
+        this.getResturants
       } else {
         this.$message.error('上传图片失败！')
       }
@@ -64,6 +230,22 @@ export default {
       return isRightType
     },
     addFood () {
+    },
+    selectActivity(){
+      const params = {}
+      params.month = this.sysFile.month
+      params.fileId = this.sysFile.id
+      //展示处理数据
+      this.$http.get('/data/findResult', {params: params}).then(({ data }) => {
+        if (data) {
+          console.log(data)
+        } else {
+          this.$message({
+            type: 'error',
+            message: data.message
+          })
+        }
+      })
     }
   }
 }

@@ -1,5 +1,10 @@
 <template>
   <div class="fillcontain">
+    <el-row style="margin-top: 20px;">
+      <el-col :span="14" :offset="1">
+            <el-button type="primary" @click="addNewDept">添加部门</el-button>
+      </el-col>
+    </el-row>
     <div class="table_container">
       <el-table
           :data="tableData"
@@ -68,27 +73,24 @@
             :total="count">
           </el-pagination>
       </div>
-      <el-dialog title="修改店铺信息" v-model="dialogFormVisible">
+      <el-dialog :title="selectTable.id?'编辑部门':'新建部门'" v-model="showDialog">
           <el-form :model="selectTable">
-              <el-form-item label="店铺名称" label-width="100px">
+              <el-form-item label="部门名称" label-width="100px">
                   <el-input v-model="selectTable.name" auto-complete="off"></el-input>
               </el-form-item>
-              <el-form-item label="店铺介绍" label-width="100px">
-                  <el-input v-model="selectTable.description"></el-input>
-              </el-form-item>
-              <el-form-item label="联系电话" label-width="100px">
-                  <el-input v-model="selectTable.phone"></el-input>
-              </el-form-item>
-              <el-form-item label="店铺分类" label-width="100px">
-                  <el-cascader
-                    :options="categoryOptions"
-                    v-model="selectedCategory"
-                    change-on-select
-                  ></el-cascader>
+              <el-form-item label="部门类型" label-width="100px">
+                  <el-select v-model="selectTable.parentType" :placeholder="selectTable.parentType">
+                      <el-option
+                          v-for="item in options"
+                          :key="item.value"
+                          :label="item.label"
+                          :value="item.value">
+                      </el-option>
+                  </el-select>
               </el-form-item>
           </el-form>
         <div slot="footer" class="dialog-footer">
-          <el-button @click="dialogFormVisible = false">取 消</el-button>
+          <el-button @click="showDialog = false">取 消</el-button>
           <el-button type="primary" @click="updateShop">确 定</el-button>
         </div>
       </el-dialog>
@@ -100,16 +102,20 @@
 export default {
   data () {
     return {
-      city: {},
+      showDialog: false,
       offset: 0,
       limit: 20,
       count: 0,
       tableData: [],
       currentPage: 1,
-      selectTable: {},
-      dialogFormVisible: false,
-      categoryOptions: [],
-      selectedCategory: [],
+      options: [{
+          value: '1',
+          label: '生成部门'
+      }, {
+          value: '2',
+          label: '非生产部门'
+      }],
+      selectTable: {parentType: '1'},
       address: {}
     }
   },
@@ -119,6 +125,9 @@ export default {
   components: {
   },
   methods: {
+    addNewDept () {
+      this.showDialog = true
+    },
     async initData () {
       try {
         throw new Error('获取数据失败')
@@ -141,9 +150,7 @@ export default {
     },
     handleEdit (index, row) {
       this.selectTable = row
-      this.address.address = row.address
-      this.dialogFormVisible = true
-      this.selectedCategory = row.category.split('/')
+      this.showDialog = true
     },
     async handleDelete (index, row) {
       try {
@@ -157,7 +164,7 @@ export default {
       }
     },
     async updateShop () {
-      this.dialogFormVisible = false
+      this.showDialog = false
       try {
         console.log('更新餐馆信息失败!')
       } catch (err) {

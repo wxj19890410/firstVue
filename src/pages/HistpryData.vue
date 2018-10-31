@@ -1,5 +1,32 @@
 <template>
     <div class="fillcontain">
+      <el-row style="margin-top: 20px;">
+        <el-col :span="14" :offset="4">
+          <header class="form_header">添加数据</header>
+          <el-form  label-width="110px" class="form food_form">
+            <el-form-item label="数据日期">
+              <el-select v-model="activityYear"  :placeholder="activityYear">
+                  <el-option
+                      v-for="item in years"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value">
+                  </el-option>
+              </el-select>
+              <el-select v-model="activityMonth" :placeholder="activityMonth">
+                  <el-option
+                      v-for="item in months"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value">
+                  </el-option>
+              </el-select>
+              <el-button type="primary" @click="addFood()">原数据计算</el-button>
+              <el-button type="primary" @click="addFood()">推送消息</el-button>
+            </el-form-item>
+          </el-form>
+        </el-col>
+      </el-row>
         <div class="table_container">
             <el-table
                 :data="tableData"
@@ -68,30 +95,6 @@
                   :total="count">
                 </el-pagination>
             </div>
-            <el-dialog title="修改店铺信息" v-model="dialogFormVisible">
-                <el-form :model="selectTable">
-                    <el-form-item label="店铺名称" label-width="100px">
-                        <el-input v-model="selectTable.name" auto-complete="off"></el-input>
-                    </el-form-item>
-                    <el-form-item label="店铺介绍" label-width="100px">
-                        <el-input v-model="selectTable.description"></el-input>
-                    </el-form-item>
-                    <el-form-item label="联系电话" label-width="100px">
-                        <el-input v-model="selectTable.phone"></el-input>
-                    </el-form-item>
-                    <el-form-item label="店铺分类" label-width="100px">
-                        <el-cascader
-                          :options="categoryOptions"
-                          v-model="selectedCategory"
-                          change-on-select
-                        ></el-cascader>
-                    </el-form-item>
-                </el-form>
-              <div slot="footer" class="dialog-footer">
-                <el-button @click="dialogFormVisible = false">取 消</el-button>
-                <el-button type="primary" @click="updateShop">确 定</el-button>
-              </div>
-            </el-dialog>
         </div>
     </div>
 </template>
@@ -110,7 +113,48 @@ export default {
       dialogFormVisible: false,
       categoryOptions: [],
       selectedCategory: [],
-      address: {}
+      address: {},
+      months: [{
+          value: '01',
+          label: '01'
+      }, {
+          value: '02',
+          label: '02'
+      }, {
+          value: '03',
+          label: '03'
+      }, {
+          value: '04',
+          label: '04'
+      }, {
+          value: '05',
+          label: '05'
+      }, {
+          value: '06',
+          label: '06'
+      }, {
+          value: '07',
+          label: '07'
+      }, {
+          value: '08',
+          label: '08'
+      }, {
+          value: '09',
+          label: '09'
+      }, {
+          value: '10',
+          label: '10'
+      }, {
+          value: '11',
+          label: '11'
+      }, {
+          value: '12',
+          label: '12'
+      }],
+      activityMonth: '01',
+      years: [],
+      activityYear: ''
+
     }
   },
   created () {
