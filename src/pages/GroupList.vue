@@ -113,12 +113,16 @@ export default {
       this.showDialog = true
     },
     async initData () {
-      try {
-        throw new Error('获取数据失败')
-        this.getResturants()
-      } catch (err) {
-        console.log('获取数据失败', err)
-      }
+      this.$http.get('/org/findGroupAll').then(({ data }) => {
+        if (data) {
+          this.tableData = data
+        } else {
+          this.$message({
+            type: 'error',
+            message: data.message
+          })
+        }
+      })
     },
     async getResturants () {
       this.tableData = []
@@ -137,23 +141,46 @@ export default {
       this.showDialog = true
     },
     async handleDelete (index, row) {
-      try {
-        console.log('删除成功')
-      } catch (err) {
-        this.$message({
-          type: 'error',
-          message: err.message
-        })
-        console.log('删除店铺失败')
-      }
+      const params = {}
+      params.id = row.id
+      this.$http.post('/org/deleteGroup', params).then(({ data }) => {
+        if (data) {
+          this.$message({
+            type: 'success',
+            message: '删除成功'
+          })
+          this.initData()
+        } else {
+          this.$message({
+            type: 'error',
+            message: data.message
+          })
+        }
+      })
     },
     async updateShop () {
       this.showDialog = false
-      try {
-        console.log('更新餐馆信息失败!')
-      } catch (err) {
-        console.log('更新餐馆信息失败', err)
+      const params = {}
+      if(this.selectTable.id){
+        params.id = this.selectTable.id
       }
+      if(this.selectTable.name){
+        params.name = this.selectTable.name
+      }
+      this.$http.post('/org/saveGroup', params).then(({ data }) => {
+        if (data) {
+          this.$message({
+            type: 'success',
+            message: '保存成功'
+          })
+          this.initData()
+        } else {
+          this.$message({
+            type: 'error',
+            message: data.message
+          })
+        }
+      })
     }
   }
 }

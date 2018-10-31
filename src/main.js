@@ -39,7 +39,7 @@ Vue.http.interceptors.push((request, next) => {
     let result = {
       ok: true
     }
-    if (response.status === 200 && !response.body.error) {
+    if (response.status === 200) {
       result.data = response.body
     } else {
       if (response.body.message === 'NotLogedInException') {
