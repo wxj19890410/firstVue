@@ -79,7 +79,7 @@
                   <el-input v-model="selectTable.name" auto-complete="off"></el-input>
               </el-form-item>
               <el-form-item label="部门类型" label-width="100px">
-                  <el-select v-model="selectTable.parentType" :placeholder="selectTable.parentType">
+                  <el-select v-model="selectTable.deptType" :placeholder="selectTable.deptType">
                       <el-option
                           v-for="item in options"
                           :key="item.value"
@@ -115,7 +115,7 @@ export default {
           value: '2',
           label: '非生产部门'
       }],
-      selectTable: {parentType: '1'},
+      selectTable: {deptType: '1'},
       address: {}
     }
   },
@@ -128,13 +128,17 @@ export default {
     addNewDept () {
       this.showDialog = true
     },
-    async initData () {
-      try {
-        throw new Error('获取数据失败')
-        this.getResturants()
-      } catch (err) {
-        console.log('获取数据失败', err)
-      }
+    initData () {
+      this.$http.get('/org/findDept').then(({ data }) => {
+        if (data) {
+          this.tableData = data
+        } else {
+          this.$message({
+            type: 'error',
+            message: data.message
+          })
+        }
+      })
     },
     async getResturants () {
       this.tableData = []
@@ -165,11 +169,28 @@ export default {
     },
     async updateShop () {
       this.showDialog = false
-      try {
-        console.log('更新餐馆信息失败!')
-      } catch (err) {
-        console.log('更新餐馆信息失败', err)
+      const params = {}
+      if(this.selectTable.id){
+        params.id = this.selectTable.id
       }
+      if(this.selectTable.name){
+        params.name = this.selectTable.name
+      }
+      params.type = this.selectTable.deptType
+      this.$http.post('/org/saveDept', params).then(({ data }) => {
+        if (data) {
+          this.$message({
+            type: 'success',
+            message: '保存成功'
+          })
+          this.initData()
+        } else {
+          this.$message({
+            type: 'error',
+            message: data.message
+          })
+        }
+      })
     }
   }
 }

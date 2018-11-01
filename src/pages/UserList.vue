@@ -51,7 +51,14 @@
                   label="店铺介绍"
                   prop="description">
                 </el-table-column>
-            </el-table>
+                <el-table-column label="操作" width="200">
+                  <template slot-scope="scope">
+                    <el-button
+                      size="mini"
+                      @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
             <div class="Pagination">
                 <el-pagination
                   @size-change="handleSizeChange"
@@ -63,6 +70,42 @@
                 </el-pagination>
             </div>
         </div>
+        <el-dialog title="人员归属" v-model="showDialog">
+          <el-form :model="selectTable">
+              <el-form-item label="部门类型" label-width="100px">
+                  <el-select v-model="selectTable.deptType" @change="deptTypeChange" :placeholder="selectTable.deptType">
+                      <el-option
+                          v-for="item in deptTypes"
+                          :key="item.value"
+                          :label="item.label"
+                          :value="item.value">
+                      </el-option>
+                  </el-select>
+                  <el-select v-model="selectTable.deptId" :placeholder="selectTable.deptId">
+                      <el-option
+                          v-for="item in deptList"
+                          :key="item.id"
+                          :label="item.name"
+                          :value="item.id">
+                      </el-option>
+                  </el-select>
+              </el-form-item>
+              <el-form-item label="选择组织" label-width="100px">
+                  <el-select v-model="selectTable.groupId" :placeholder="selectTable.groupId">
+                      <el-option
+                          v-for="item in groupList"
+                          :key="item.id"
+                          :label="item.name"
+                          :value="item.id">
+                      </el-option>
+                  </el-select>
+              </el-form-item>
+          </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="showDialog = false">取 消</el-button>
+          <el-button type="primary" @click="updateRelation">确 定</el-button>
+        </div>
+      </el-dialog>
     </div>
 </template>
 
@@ -75,7 +118,18 @@ export default {
       count: 0,
       tableData: [],
       currentPage: 1,
-      address: {}
+      address: {},
+      groupList: [],
+      deptList: [],
+      deptTypes: [{
+          value: '1',
+          label: '生成部门'
+      }, {
+          value: '2',
+          label: '非生产部门'
+      }],
+      selectTable: {deptType: '1'},
+      showDialog: false
     }
   },
   created () {
@@ -84,13 +138,51 @@ export default {
   components: {
   },
   methods: {
-    async initData () {
-      try {
-        throw new Error('获取数据失败')
-        this.getResturants()
-      } catch (err) {
-        console.log('获取数据失败', err)
-      }
+    getGroupList(){
+      this.$http.get('/org/findGroup').then(({ data }) => {
+        if (data) {
+          this.groupList = data
+        } else {
+          this.$message({
+            type: 'error',
+            message: data.message
+          })
+        }
+      })
+    },
+    deptTypeChange() {
+      this.deptList = []
+      const params = {}
+      params.deptType = this.selectTable.deptType
+      this.$http.get('/org/findDept',{params:params}).then(({ data }) => {
+        if (data) {
+          this.deptList = data
+        } else {
+          this.$message({
+            type: 'error',
+            message: data.message
+          })
+        }
+      })
+    },
+    handleEdit (index, row) {
+      this.selectTable = row
+      this.selectTable.deptType = '1'
+      this.deptTypeChange()
+      this.getGroupList()
+      this.showDialog = true
+    },
+    initData () {
+      this.$http.get('/user/findUserList').then(({ data }) => {
+        if (data) {
+          this.tableData = data
+        } else {
+          this.$message({
+            type: 'error',
+            message: data.message
+          })
+        }
+      })
     },
     async getResturants () {
       this.tableData = []
@@ -106,6 +198,31 @@ export default {
     },
     updateUser (index, row) {
 
+    },
+    async updateRelation () {
+      this.showDialog = false
+      const params = {}
+      if(this.selectTable.id){
+        params.id = this.selectTable.id
+      }
+      if(this.selectTable.name){
+        params.name = this.selectTable.name
+      }
+      params.type = this.selectTable.deptType
+      this.$http.post('/org/saveDept', params).then(({ data }) => {
+        if (data) {
+          this.$message({
+            type: 'success',
+            message: '保存成功'
+          })
+          this.initData()
+        } else {
+          this.$message({
+            type: 'error',
+            message: data.message
+          })
+        }
+      })
     }
   }
 }

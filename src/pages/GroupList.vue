@@ -113,7 +113,7 @@ export default {
       this.showDialog = true
     },
     async initData () {
-      this.$http.get('/org/findGroupAll').then(({ data }) => {
+      this.$http.get('/org/findGroup').then(({ data }) => {
         if (data) {
           this.tableData = data
         } else {
