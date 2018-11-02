@@ -113,9 +113,12 @@ export default {
       this.showDialog = true
     },
     async initData () {
-      this.$http.get('/org/findGroup').then(({ data }) => {
+      const params = {}
+      params.start = 0
+      params.length = 10
+      this.$http.get('/org/groupDataGrid', {params: params}).then(({ data }) => {
         if (data) {
-          this.tableData = data
+          this.tableData = data.rows
         } else {
           this.$message({
             type: 'error',
@@ -141,21 +144,15 @@ export default {
       this.showDialog = true
     },
     async handleDelete (index, row) {
+      console.log(row)
       const params = {}
       params.id = row.id
       this.$http.post('/org/deleteGroup', params).then(({ data }) => {
-        if (data) {
-          this.$message({
-            type: 'success',
-            message: '删除成功'
-          })
-          this.initData()
-        } else {
-          this.$message({
-            type: 'error',
-            message: data.message
-          })
-        }
+        this.$message({
+          type: 'success',
+          message: '删除成功'
+        })
+        this.initData()
       })
     },
     async updateShop () {

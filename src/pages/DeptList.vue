@@ -68,7 +68,7 @@
             @size-change="handleSizeChange"
             @current-change="handleCurrentChange"
             :current-page="currentPage"
-            :page-size="20"
+            :page-size="pageSize"
             layout="total, prev, pager, next"
             :total="count">
           </el-pagination>
@@ -103,11 +103,10 @@ export default {
   data () {
     return {
       showDialog: false,
-      offset: 0,
-      limit: 20,
       count: 0,
-      tableData: [],
+      pageSize: 10,
       currentPage: 1,
+      tableData: [],
       options: [{
           value: '1',
           label: '生成部门'
@@ -129,9 +128,13 @@ export default {
       this.showDialog = true
     },
     initData () {
-      this.$http.get('/org/findDept').then(({ data }) => {
+      const params = {}
+      params.start = (this.currentPage - 1) * this.pageSize
+      params.length = this.pageSize
+      this.$http.get('/org/deptDataGrid', {params: params}).then(({ data }) => {
         if (data) {
-          this.tableData = data
+          this.tableData = data.rows
+          this.count = data.count
         } else {
           this.$message({
             type: 'error',
@@ -141,15 +144,15 @@ export default {
       })
     },
     async getResturants () {
-      this.tableData = []
-      console.log('获取数据失败')
+      this.initData()
     },
     handleSizeChange (val) {
-      console.log(`每页 ${val} 条`)
+      console.log(val)
+      this.currentPage = val
+      this.initData()
     },
     handleCurrentChange (val) {
       this.currentPage = val
-      this.offset = (val - 1) * this.limit
       this.getResturants()
     },
     handleEdit (index, row) {
@@ -157,15 +160,15 @@ export default {
       this.showDialog = true
     },
     async handleDelete (index, row) {
-      try {
-        console.log('删除成功')
-      } catch (err) {
+      const params = {}
+      params.id = row.id
+      this.$http.post('/org/deleteDept', params).then(({ data }) => {
         this.$message({
-          type: 'error',
-          message: err.message
+          type: 'success',
+          message: '删除成功'
         })
-        console.log('删除店铺失败')
-      }
+        this.initData()
+      })
     },
     async updateShop () {
       this.showDialog = false
