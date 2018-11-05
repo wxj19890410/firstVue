@@ -64,7 +64,7 @@
                   @size-change="handleSizeChange"
                   @current-change="handleCurrentChange"
                   :current-page="currentPage"
-                  :page-size="20"
+                  :page-size="pageSize"
                   layout="total, prev, pager, next"
                   :total="count">
                 </el-pagination>
@@ -113,12 +113,11 @@
 export default {
   data () {
     return {
-      offset: 0,
-      limit: 20,
       count: 0,
-      tableData: [],
+      pageSize: 10,
       currentPage: 1,
-      address: {},
+      tableData: [],
+      
       groupList: [],
       deptList: [],
       deptTypes: [{
@@ -139,7 +138,7 @@ export default {
   },
   methods: {
     getGroupList(){
-      this.$http.get('/org/findGroup').then(({ data }) => {
+      this.$http.get('/org/findGroupMap').then(({ data }) => {
         if (data) {
           this.groupList = data
         } else {
@@ -154,9 +153,10 @@ export default {
       this.deptList = []
       const params = {}
       params.deptType = this.selectTable.deptType
-      this.$http.get('/org/findDept',{params:params}).then(({ data }) => {
+      this.$http.get('/org/findDeptMap',{params:params}).then(({ data }) => {
         if (data) {
           this.deptList = data
+          this.selectTable.deptId = null
         } else {
           this.$message({
             type: 'error',
@@ -167,15 +167,18 @@ export default {
     },
     handleEdit (index, row) {
       this.selectTable = row
-      this.selectTable.deptType = '1'
       this.deptTypeChange()
       this.getGroupList()
       this.showDialog = true
     },
     initData () {
-      this.$http.get('/user/findUserList').then(({ data }) => {
+      const params = {}
+      params.start = (this.currentPage - 1) * this.pageSize
+      params.length = this.pageSize
+      this.$http.get('/user/userDataGrid', {params: params}).then(({ data }) => {
         if (data) {
-          this.tableData = data
+          this.tableData = data.rows
+          this.count = data.count
         } else {
           this.$message({
             type: 'error',
@@ -189,12 +192,12 @@ export default {
       console.log('获取数据失败')
     },
     handleSizeChange (val) {
-      console.log(`每页 ${val} 条`)
+      this.currentPage = val
+      this.initData()
     },
     handleCurrentChange (val) {
       this.currentPage = val
-      this.offset = (val - 1) * this.limit
-      this.getResturants()
+      this.initData()
     },
     updateUser (index, row) {
 
@@ -202,14 +205,16 @@ export default {
     async updateRelation () {
       this.showDialog = false
       const params = {}
-      if(this.selectTable.id){
-        params.id = this.selectTable.id
+      if(this.selectTable.openId){
+        params.openId = this.selectTable.openId
       }
-      if(this.selectTable.name){
-        params.name = this.selectTable.name
+      if(this.selectTable.deptId){
+        params.deptId = this.selectTable.deptId
       }
-      params.type = this.selectTable.deptType
-      this.$http.post('/org/saveDept', params).then(({ data }) => {
+       if(this.selectTable.groupId){
+        params.groupId = this.selectTable.groupId
+      }
+      this.$http.post('/user/setUserRelation', params).then(({ data }) => {
         if (data) {
           this.$message({
             type: 'success',

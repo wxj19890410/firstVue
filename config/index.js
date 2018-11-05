@@ -11,11 +11,19 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-        '/bgpz': {
+        '/huoli': {
             target: 'http://localhost:8083/',
             changeOrigin: true,
             pathRewrite: {
-                '^/bgpz': '/'
+                '^/huoli': '/'
+            }
+        },
+
+        '/wx': {
+            target: 'https://qyapi.weixin.qq.com/cgi-bin/',
+            changeOrigin: true,
+            pathRewrite: {
+                '^/wx': '/'
             }
         }
     },

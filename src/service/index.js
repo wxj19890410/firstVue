@@ -8,6 +8,7 @@ const localStorage = {
       cacheTime: new Date()
     }
     window.localStorage.setItem(STORAGE_KEY + key, JSON.stringify(data))
+    window.localStorage.setItem(STORAGE_KEY + key, JSON.stringify(data))
   },
   get (key) {
     return JSON.parse(window.localStorage.getItem(STORAGE_KEY + key) || '{}').data

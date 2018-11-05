@@ -24,7 +24,10 @@
                     :value="item.value">
                 </el-option>
             </el-select>
-            <el-button type="primary" @click="addFood()">原数据计算</el-button>
+            <el-button type="primary" @click="setResultData()">原数据计算</el-button>
+            <el-button type="primary" @click="refreshUser()">更新人员</el-button>
+            <el-button type="primary" @click="refreshDept()">更新部门</el-button>
+
   					<el-button type="primary" @click="addFood()">推送消息</el-button>
   				</el-form-item>
   			</el-form>
@@ -35,105 +38,41 @@
             <el-table
                 :data="tableData"
                 style="width: 100%">
-                <el-table-column type="expand">
-                  <template slot-scope="props">
-                    <el-form label-position="left" inline class="demo-table-expand">
-                      <el-form-item label="店铺名称">
-                        <span>{{ props.row.name }}</span>
-                      </el-form-item>
-                      <el-form-item label="店铺地址">
-                        <span>{{ props.row.address }}</span>
-                      </el-form-item>
-                      <el-form-item label="店铺介绍">
-                        <span>{{ props.row.description }}</span>
-                      </el-form-item>
-                      <el-form-item label="店铺 ID">
-                        <span>{{ props.row.id }}</span>
-                      </el-form-item>
-                      <el-form-item label="联系电话">
-                        <span>{{ props.row.phone }}</span>
-                      </el-form-item>
-                      <el-form-item label="评分">
-                        <span>{{ props.row.rating }}</span>
-                      </el-form-item>
-                      <el-form-item label="销售量">
-                        <span>{{ props.row.recent_order_num }}</span>
-                      </el-form-item>
-                      <el-form-item label="分类">
-                        <span>{{ props.row.category }}</span>
-                      </el-form-item>
-                    </el-form>
-                  </template>
+                <el-table-column
+                  label="姓名"
+                  prop="userName">
                 </el-table-column>
                 <el-table-column
-                  label="店铺名称"
-                  prop="name">
+                  label="号码"
+                  prop="phone">
                 </el-table-column>
                 <el-table-column
-                  label="店铺地址"
-                  prop="address">
+                  label="学习成长"
+                  prop="study">
                 </el-table-column>
                 <el-table-column
-                  label="店铺介绍"
-                  prop="description">
-                </el-table-column>
-            </el-table>
-            <div class="Pagination">
-                <el-pagination
-                  @size-change="handleSizeChange"
-                  @current-change="handleCurrentChange"
-                  :current-page="currentPage"
-                  :page-size="20"
-                  layout="total, prev, pager, next"
-                  :total="count">
-                </el-pagination>
-            </div>
-        </div>
-        <div class="table_container" v-show = "activityValue==='1'">
-            <el-table
-                :data="tableData"
-                style="width: 100%">
-                <el-table-column type="expand">
-                  <template slot-scope="props">
-                    <el-form label-position="left" inline class="demo-table-expand">
-                      <el-form-item label="店铺名称">
-                        <span>{{ props.row.name }}</span>
-                      </el-form-item>
-                      <el-form-item label="店铺地址">
-                        <span>{{ props.row.address }}</span>
-                      </el-form-item>
-                      <el-form-item label="店铺介绍">
-                        <span>{{ props.row.description }}</span>
-                      </el-form-item>
-                      <el-form-item label="店铺 ID">
-                        <span>{{ props.row.id }}</span>
-                      </el-form-item>
-                      <el-form-item label="联系电话">
-                        <span>{{ props.row.phone }}</span>
-                      </el-form-item>
-                      <el-form-item label="评分">
-                        <span>{{ props.row.rating }}</span>
-                      </el-form-item>
-                      <el-form-item label="销售量">
-                        <span>{{ props.row.recent_order_num }}</span>
-                      </el-form-item>
-                      <el-form-item label="分类">
-                        <span>{{ props.row.category }}</span>
-                      </el-form-item>
-                    </el-form>
-                  </template>
+                  label="读书指数"
+                  prop="read">
                 </el-table-column>
                 <el-table-column
-                  label="店铺名称2"
-                  prop="name">
+                  label="企业文化"
+                  prop="culture">
                 </el-table-column>
                 <el-table-column
-                  label="店铺地址2"
-                  prop="address">
+                  label="出勤指数"
+                  prop="attendance">
                 </el-table-column>
                 <el-table-column
-                  label="店铺介绍3"
-                  prop="description">
+                  label="HSE"
+                  prop="hse">
+                </el-table-column>
+                <el-table-column
+                  label="精益改善"
+                  prop="improve">
+                </el-table-column>
+                <el-table-column
+                  label="总指数"
+                  prop="total">
                 </el-table-column>
             </el-table>
             <div class="Pagination">
@@ -171,6 +110,7 @@ export default {
       offset: 0,
       count: 0,
       tableData: [],
+      pageSize: 10,
       currentPage: 1,
       selectTable: {}
     }
@@ -178,17 +118,20 @@ export default {
   components: {
   },
   created () {
-    this.initData()
+    this.getResturants()
   },
   methods: {
     getResturants() {
       const params = {}
-      params.month = this.sysFile.month
-      params.fileId = this.sysFile.id
+      //params.month = this.sysFile.month
+      params.fileId = 1
+      params.start = (this.currentPage - 1) * this.pageSize
+      params.length = this.pageSize
       //展示源数据
-      this.$http.get('/data/findOriginal', {params: params}).then(({ data }) => {
+      this.$http.get('/data/dataDataGrid', {params: params}).then(({ data }) => {
         if (data) {
-          console.log(data)
+          this.tableData = data.rows
+          this.count = data.count
         } else {
           this.$message({
             type: 'error',
@@ -198,24 +141,17 @@ export default {
       })
     },
     handleSizeChange (val) {
-      console.log(`每页 ${val} 条`)
+      this.currentPage = val
+      this.getResturants()
     },
     handleCurrentChange (val) {
       this.currentPage = val
-      this.offset = (val - 1) * this.limit
       this.getResturants()
-    },
-    initData () {
-      try {
-        //
-      } catch (err) {
-        console.log(err)
-      }
     },
     uploadImg (res, file) {
       if (res.id) {
         this.sysFile = res
-        this.getResturants
+        this.getResturants()
       } else {
         this.$message.error('上传图片失败！')
       }
@@ -228,6 +164,56 @@ export default {
         this.$message.error('只能上传Excel!')
       }
       return isRightType
+    },
+    setResultData(){
+      const params = {}
+      params.month = '2018-11'
+      //展示处理数据
+      this.$http.post('/data/setAverageData', params).then(({ data }) => {
+        if (data) {
+          console.log(data)
+        } else {
+          this.$message({
+            type: 'error',
+            message: data.message
+          })
+        }
+      })
+    },
+    refreshUser () {
+      this.$http.get('/wxData/refreshUser').then(({ data }) => {
+        if (data) {
+          console.log(data)
+        } else {
+          this.$message({
+            type: 'error',
+            message: data.message
+          })
+        }
+      })
+    },
+    refreshDept () {
+      this.$http.get('/wx/gettoken', {params: window.GLOBLE.params}).then(({ data }) => {
+        if (data && data.errcode ===0) {
+          const params2= {}
+          params2.access_token= data.access_token
+          this.$http.get('/wx/department/list', {params: params2}).then(({ data2 }) => {
+            if (data2 && data2.errcode ===0) {
+              console.log(data2)
+            } else {
+              this.$message({
+                type: 'error',
+                message: data.message
+              })
+            }
+          })
+        } else {
+          this.$message({
+            type: 'error',
+            message: data.message
+          })
+        }
+      })
     },
     addFood () {
     },

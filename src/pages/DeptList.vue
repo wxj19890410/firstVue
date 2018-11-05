@@ -125,6 +125,7 @@ export default {
   },
   methods: {
     addNewDept () {
+      this.selectTable= {deptType: '1'}
       this.showDialog = true
     },
     initData () {
@@ -143,17 +144,13 @@ export default {
         }
       })
     },
-    async getResturants () {
-      this.initData()
-    },
     handleSizeChange (val) {
-      console.log(val)
       this.currentPage = val
       this.initData()
     },
     handleCurrentChange (val) {
       this.currentPage = val
-      this.getResturants()
+      this.initData()
     },
     handleEdit (index, row) {
       this.selectTable = row
@@ -179,7 +176,7 @@ export default {
       if(this.selectTable.name){
         params.name = this.selectTable.name
       }
-      params.type = this.selectTable.deptType
+      params.deptType = this.selectTable.deptType
       this.$http.post('/org/saveDept', params).then(({ data }) => {
         if (data) {
           this.$message({

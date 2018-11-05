@@ -56,7 +56,7 @@ export default {
     async submitForm (formName) {
       this.$refs[formName].validate(async (valid) => {
         if (valid) {
-          this.$http.post('/login/loadInfo', {account: 'admin', password: '123456'}).then(({ data }) => {
+          this.$http.post('/huoli/login/loadInfo', {account: 'admin', password: '123456'}).then(({ data }) => {
             if (data) {
               this.$message({
                 type: 'success',
