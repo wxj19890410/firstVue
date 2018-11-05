@@ -204,18 +204,7 @@ export default {
         }
       })
     },
-    refreshDept () {
-      this.$http.get('/huoli/wxData/refreshDept').then(({ data }) => {
-        if (data && data.errcode ===0) {
 
-        } else {
-          this.$message({
-            type: 'error',
-            message: data.message
-          })
-        }
-      })
-    },
     addFood () {
     },
     selectActivity(){

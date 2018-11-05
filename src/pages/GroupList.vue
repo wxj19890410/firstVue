@@ -15,7 +15,7 @@
             </el-table-column>
             <el-table-column
               label="人数"
-              prop="address">
+              prop="personNub">
             </el-table-column>
             <el-table-column
               label="学习成长"
@@ -112,6 +112,7 @@ export default {
       this.$http.get('/huoli/org/groupDataGrid', {params: params}).then(({ data }) => {
         if (data) {
           this.tableData = data.rows
+          this.count = data.count
         } else {
           this.$message({
             type: 'error',

@@ -11,6 +11,13 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
+        '/bizmp': {
+            target: 'http://shp.qpic.cn/',
+            changeOrigin: true,
+            pathRewrite: {
+                '^/bizmp': '/bizmp'
+            }
+        },
         '/huoli': {
             target: 'http://localhost:8083/',
             changeOrigin: true,

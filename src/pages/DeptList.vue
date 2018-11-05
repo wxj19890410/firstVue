@@ -2,55 +2,49 @@
   <div class="fillcontain">
     <el-row style="margin-top: 20px;">
       <el-col :span="14" :offset="1">
-            <el-button type="primary" @click="addNewDept">添加部门</el-button>
+        <el-button type="primary" @click="refreshDept()">更新部门</el-button>
       </el-col>
     </el-row>
     <div class="table_container">
       <el-table
           :data="tableData"
           style="width: 100%">
-          <el-table-column type="expand">
-            <template slot-scope="props">
-              <el-form label-position="left" inline class="demo-table-expand">
-                <el-form-item label="店铺名称">
-                  <span>{{ props.row.name }}</span>
-                </el-form-item>
-                <el-form-item label="店铺地址">
-                  <span>{{ props.row.address }}</span>
-                </el-form-item>
-                <el-form-item label="店铺介绍">
-                  <span>{{ props.row.description }}</span>
-                </el-form-item>
-                <el-form-item label="店铺 ID">
-                  <span>{{ props.row.id }}</span>
-                </el-form-item>
-                <el-form-item label="联系电话">
-                  <span>{{ props.row.phone }}</span>
-                </el-form-item>
-                <el-form-item label="评分">
-                  <span>{{ props.row.rating }}</span>
-                </el-form-item>
-                <el-form-item label="销售量">
-                  <span>{{ props.row.recent_order_num }}</span>
-                </el-form-item>
-                <el-form-item label="分类">
-                  <span>{{ props.row.category }}</span>
-                </el-form-item>
-              </el-form>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="店铺名称"
-            prop="name">
-          </el-table-column>
-          <el-table-column
-            label="店铺地址"
-            prop="address">
-          </el-table-column>
-          <el-table-column
-            label="店铺介绍"
-            prop="description">
-          </el-table-column>
+           <el-table-column
+              label="班组"
+              prop="name">
+            </el-table-column>
+            <el-table-column
+              label="人数"
+              prop="personNub">
+            </el-table-column>
+            <el-table-column
+              label="学习成长"
+              prop="study">
+            </el-table-column>
+            <el-table-column
+              label="读书指数"
+              prop="read">
+            </el-table-column>
+            <el-table-column
+              label="企业文化"
+              prop="culture">
+            </el-table-column>
+            <el-table-column
+              label="出勤指数"
+              prop="attendance">
+            </el-table-column>
+            <el-table-column
+              label="HSE"
+              prop="hse">
+            </el-table-column>
+            <el-table-column
+              label="精益改善"
+              prop="improve">
+            </el-table-column>
+            <el-table-column
+              label="总指数"
+              prop="total">
+            </el-table-column>
           <el-table-column label="操作" width="200">
             <template slot-scope="scope">
               <el-button
@@ -104,7 +98,7 @@ export default {
     return {
       showDialog: false,
       count: 0,
-      pageSize: 10,
+      pageSize: 15,
       currentPage: 1,
       tableData: [],
       options: [{
@@ -124,15 +118,23 @@ export default {
   components: {
   },
   methods: {
-    addNewDept () {
-      this.selectTable= {deptType: '1'}
-      this.showDialog = true
+    refreshDept () {
+      this.$http.get('/huoli/wxData/refreshDept').then(({ data }) => {
+        if (data && data.errcode ===0) {
+
+        } else {
+          this.$message({
+            type: 'error',
+            message: data.message
+          })
+        }
+      })
     },
     initData () {
       const params = {}
       params.start = (this.currentPage - 1) * this.pageSize
       params.length = this.pageSize
-      this.$http.get('/org/deptDataGrid', {params: params}).then(({ data }) => {
+      this.$http.get('/huoli/org/deptDataGrid', {params: params}).then(({ data }) => {
         if (data) {
           this.tableData = data.rows
           this.count = data.count
