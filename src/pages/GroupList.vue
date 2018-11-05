@@ -9,57 +9,51 @@
         <el-table
             :data="tableData"
             style="width: 100%">
-            <el-table-column type="expand">
-              <template slot-scope="props">
-                <el-form label-position="left" inline class="demo-table-expand">
-                  <el-form-item label="店铺名称">
-                    <span>{{ props.row.name }}</span>
-                  </el-form-item>
-                  <el-form-item label="店铺地址">
-                    <span>{{ props.row.address }}</span>
-                  </el-form-item>
-                  <el-form-item label="店铺介绍">
-                    <span>{{ props.row.description }}</span>
-                  </el-form-item>
-                  <el-form-item label="店铺 ID">
-                    <span>{{ props.row.id }}</span>
-                  </el-form-item>
-                  <el-form-item label="联系电话">
-                    <span>{{ props.row.phone }}</span>
-                  </el-form-item>
-                  <el-form-item label="评分">
-                    <span>{{ props.row.rating }}</span>
-                  </el-form-item>
-                  <el-form-item label="销售量">
-                    <span>{{ props.row.recent_order_num }}</span>
-                  </el-form-item>
-                  <el-form-item label="分类">
-                    <span>{{ props.row.category }}</span>
-                  </el-form-item>
-                </el-form>
-              </template>
-            </el-table-column>
             <el-table-column
-              label="店铺名称"
+              label="班组"
               prop="name">
             </el-table-column>
             <el-table-column
-              label="店铺地址"
+              label="人数"
               prop="address">
             </el-table-column>
             <el-table-column
-              label="店铺介绍"
-              prop="description">
+              label="学习成长"
+              prop="study">
+            </el-table-column>
+            <el-table-column
+              label="读书指数"
+              prop="read">
+            </el-table-column>
+            <el-table-column
+              label="企业文化"
+              prop="culture">
+            </el-table-column>
+            <el-table-column
+              label="出勤指数"
+              prop="attendance">
+            </el-table-column>
+            <el-table-column
+              label="HSE"
+              prop="hse">
+            </el-table-column>
+            <el-table-column
+              label="精益改善"
+              prop="improve">
+            </el-table-column>
+            <el-table-column
+              label="总指数"
+              prop="total">
             </el-table-column>
             <el-table-column label="操作" width="200">
               <template slot-scope="scope">
                 <el-button
                   size="mini"
-                  @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                  @click="handleEdit(scope.$index, scope.row)">查看人员</el-button>
                 <el-button
                   size="mini"
                   type="danger"
-                  @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                  @click="handleDelete(scope.$index, scope.row)">查看历史</el-button>
               </template>
             </el-table-column>
         </el-table>
@@ -87,7 +81,6 @@
       </div>
     </div>
 </template>
-
 <script>
 export default {
   data () {
@@ -116,7 +109,7 @@ export default {
       const params = {}
       params.start = 0
       params.length = 10
-      this.$http.get('/org/groupDataGrid', {params: params}).then(({ data }) => {
+      this.$http.get('/huoli/org/groupDataGrid', {params: params}).then(({ data }) => {
         if (data) {
           this.tableData = data.rows
         } else {

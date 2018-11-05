@@ -27,7 +27,7 @@
             <el-button type="primary" @click="setResultData()">原数据计算</el-button>
             <el-button type="primary" @click="refreshUser()">更新人员</el-button>
             <el-button type="primary" @click="refreshDept()">更新部门</el-button>
-
+            <el-button type="primary" @click="refreshGroup()">更新班组</el-button>
   					<el-button type="primary" @click="addFood()">推送消息</el-button>
   				</el-form-item>
   			</el-form>
@@ -192,21 +192,22 @@ export default {
         }
       })
     },
-    refreshDept () {
-      this.$http.get('/wx/gettoken', {params: window.GLOBLE.params}).then(({ data }) => {
+    refreshGroup () {
+      this.$http.get('/huoli/wxData/refreshTag').then(({ data }) => {
         if (data && data.errcode ===0) {
-          const params2= {}
-          params2.access_token= data.access_token
-          this.$http.get('/wx/department/list', {params: params2}).then(({ data2 }) => {
-            if (data2 && data2.errcode ===0) {
-              console.log(data2)
-            } else {
-              this.$message({
-                type: 'error',
-                message: data.message
-              })
-            }
+
+        } else {
+          this.$message({
+            type: 'error',
+            message: data.message
           })
+        }
+      })
+    },
+    refreshDept () {
+      this.$http.get('/huoli/wxData/refreshDept').then(({ data }) => {
+        if (data && data.errcode ===0) {
+
         } else {
           this.$message({
             type: 'error',
