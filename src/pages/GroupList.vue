@@ -2,7 +2,7 @@
     <div class="fillcontain">
       <el-row style="margin-top: 20px;">
         <el-col :span="14" :offset="1">
-          <el-button type="primary" @click="addNewGroup">添加新组</el-button>
+          <el-button type="primary" @click="refreshGroup()">更新班组</el-button>
         </el-col>
       </el-row>
       <div class="table_container">
@@ -101,9 +101,17 @@ export default {
   components: {
   },
   methods: {
-    addNewGroup () {
-      this.selectTable = {}
-      this.showDialog = true
+    refreshGroup () {
+      this.$http.get('/huoli/wxData/refreshTag').then(({ data }) => {
+        if (data && data.errcode ===0) {
+
+        } else {
+          this.$message({
+            type: 'error',
+            message: data.message
+          })
+        }
+      })
     },
     async initData () {
       const params = {}

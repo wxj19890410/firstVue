@@ -15,26 +15,15 @@
   					  <i>上传图片</i>
   					</el-upload>
   				</el-form-item>
-          <el-form-item label="列表数据">
-            <el-select v-model="activityValue" @change="selectActivity" :placeholder="activityValue">
-                <el-option
-                    v-for="item in options"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value">
-                </el-option>
-            </el-select>
-            <el-button type="primary" @click="setResultData()">原数据计算</el-button>
-            <el-button type="primary" @click="refreshUser()">更新人员</el-button>
-            <el-button type="primary" @click="refreshDept()">更新部门</el-button>
-            <el-button type="primary" @click="refreshGroup()">更新班组</el-button>
-  					<el-button type="primary" @click="addFood()">推送消息</el-button>
+          <el-form-item label="数据操作">
+            <el-button type="primary" @click="setResultData()">发布</el-button>
+  					<!-- <el-button type="primary" @click="addFood()">推送消息</el-button> -->
   				</el-form-item>
   			</el-form>
   		</el-col>
   	</el-row>
     <div class="fillcontain">
-        <div class="table_container" v-show = "activityValue==='0'">
+        <div class="table_container" >
             <el-table
                 :data="tableData"
                 style="width: 100%">
@@ -44,7 +33,7 @@
                 </el-table-column>
                 <el-table-column
                   label="号码"
-                  prop="phone">
+                  prop="mobile" style="width: 200%">
                 </el-table-column>
                 <el-table-column
                   label="学习成长"
@@ -70,10 +59,6 @@
                   label="精益改善"
                   prop="improve">
                 </el-table-column>
-                <el-table-column
-                  label="总指数"
-                  prop="total">
-                </el-table-column>
             </el-table>
             <div class="Pagination">
                 <el-pagination
@@ -98,14 +83,6 @@ export default {
       headers: {
         loginUuid: this.$service.localStorage.get('loginUuid')
       },
-      options: [{
-          value: '0',
-          label: '原数据'
-      }, {
-          value: '1',
-          label: '最终数据'
-      }],
-      activityValue: '0',
       sysFile: null,
       offset: 0,
       count: 0,
@@ -124,11 +101,12 @@ export default {
     getResturants() {
       const params = {}
       //params.month = this.sysFile.month
-      params.fileId = 1
+      // params.fileId = this.sysFile.id
+      params.fileId = 13
       params.start = (this.currentPage - 1) * this.pageSize
       params.length = this.pageSize
       //展示源数据
-      this.$http.get('/data/dataDataGrid', {params: params}).then(({ data }) => {
+      this.$http.get('/huoli/data/dataDataGrid', {params: params}).then(({ data }) => {
         if (data) {
           this.tableData = data.rows
           this.count = data.count
@@ -169,7 +147,7 @@ export default {
       const params = {}
       params.month = '2018-11'
       //展示处理数据
-      this.$http.post('/data/setAverageData', params).then(({ data }) => {
+      this.$http.post('/huoli/data/setAverageData', params).then(({ data }) => {
         if (data) {
           console.log(data)
         } else {
@@ -180,30 +158,8 @@ export default {
         }
       })
     },
-    refreshUser () {
-      this.$http.get('/wxData/refreshUser').then(({ data }) => {
-        if (data) {
-          console.log(data)
-        } else {
-          this.$message({
-            type: 'error',
-            message: data.message
-          })
-        }
-      })
-    },
-    refreshGroup () {
-      this.$http.get('/huoli/wxData/refreshTag').then(({ data }) => {
-        if (data && data.errcode ===0) {
-
-        } else {
-          this.$message({
-            type: 'error',
-            message: data.message
-          })
-        }
-      })
-    },
+    
+    
 
     addFood () {
     },
