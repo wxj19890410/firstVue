@@ -147,7 +147,7 @@ export default {
       const params = {}
       params.month = '2018-11'
       //展示处理数据
-      this.$http.post('/huoli/data/setAverageData', params).then(({ data }) => {
+      this.$http.get('/huoli/data/setAverageData', {params: params}).then(({ data }) => {
         if (data) {
           console.log(data)
         } else {

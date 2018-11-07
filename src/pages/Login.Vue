@@ -3,7 +3,7 @@
       <transition name="form-fade" mode="in-out">
         <section class="form_contianer" v-show="showLogin">
           <div class="manage_tip">
-            <p>elm后台管理系统</p>
+            <p>活力系统后台管理系统</p>
           </div>
           <el-form :model="loginForm" :rules="rules" ref="loginForm">
             <el-form-item prop="username">
@@ -16,9 +16,6 @@
                 <el-button type="primary" @click="submitForm('loginForm')" class="submit_btn">登陆</el-button>
               </el-form-item>
           </el-form>
-          <p class="tip">温馨提示：</p>
-          <p class="tip">未登录过的新用户，自动注册</p>
-          <p class="tip">注册过的用户可凭账号密码登录</p>
         </section>
       </transition>
     </div>
@@ -56,7 +53,10 @@ export default {
     async submitForm (formName) {
       this.$refs[formName].validate(async (valid) => {
         if (valid) {
-          this.$http.post('/huoli/login/loadInfo', {account: 'admin', password: '123456'}).then(({ data }) => {
+          const params = {}
+          params.account = 'admin'
+          params.password = '123456'
+          this.$http.get('/huoli/login/loadInfo', {params: params}).then(({ data }) => {
             if (data) {
               this.$message({
                 type: 'success',
