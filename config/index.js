@@ -22,7 +22,7 @@ module.exports = {
             target: 'http://localhost:8083/',
             changeOrigin: true,
             pathRewrite: {
-                '^/huoli': '/'
+                '^/huoli': '/huoli'
             }
         },
 

@@ -19,7 +19,7 @@ Vue.use(VueResource)
 Vue.prototype.$service = service
 Vue.http.options.emulateJSON = true
 Vue.http.interceptors.push((request, next) => {
-  console.log(window.GLOBLE.apiUrl)
+  // console.log(window.GLOBLE.apiUrl)
   // request.url = window.GLOBLE.apiUrl + request.url
   request.headers.set('loginUuid', service.localStorage.get('loginUuid'))
   if (request.method === 'POST' && request.body) {
