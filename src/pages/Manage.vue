@@ -30,8 +30,12 @@
 </template>
 
 <script>
+import HeadTop from '../components/HeadTop'
 export default {
-  computed: {
+	components: {
+		HeadTop
+	},
+    computed: {
     defaultActive: function () {
       return this.$route.path.replace('/', '')
     }

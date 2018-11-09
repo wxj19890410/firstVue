@@ -54,10 +54,11 @@ export default {
       this.$refs[formName].validate(async (valid) => {
         if (valid) {
           const params = {}
-          params.account = 'admin'
-          params.password = '123456'
+          params.account = this.loginForm.username
+          params.password = this.loginForm.password
           this.$http.get('/huoli/login/loadInfo', {params: params}).then(({ data }) => {
-            if (data) {
+            console.log(data)
+            if (data && !data.error) {
               this.$message({
                 type: 'success',
                 message: '登录成功'
@@ -66,6 +67,7 @@ export default {
               this.$service.localStorage.save('loginUuid', data.loginUuid)
               this.$router.push('manage')
             } else {
+
               this.$message({
                 type: 'error',
                 message: data.message

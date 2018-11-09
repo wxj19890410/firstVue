@@ -1,5 +1,6 @@
 <template>
   <div class="fillcontain">
+    <HeadTop></HeadTop>
     <el-row style="margin-top: 20px;">
       <el-col :span="14" :offset="1">
         <el-button type="primary" @click="refreshDept()">更新部门</el-button>
@@ -49,11 +50,8 @@
             <template slot-scope="scope">
               <el-button
                 size="mini"
-                @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-              <el-button
-                size="mini"
-                type="danger"
-                @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                disabled
+                @click="handleEdit(scope.$index, scope.row)">查看历史</el-button>
             </template>
           </el-table-column>
       </el-table>
@@ -67,33 +65,59 @@
             :total="count">
           </el-pagination>
       </div>
-      <el-dialog :title="selectTable.id?'编辑部门':'新建部门'" v-model="showDialog">
-          <el-form :model="selectTable">
-              <el-form-item label="部门名称" label-width="100px">
-                  <el-input v-model="selectTable.name" auto-complete="off"></el-input>
-              </el-form-item>
-              <el-form-item label="部门类型" label-width="100px">
-                  <el-select v-model="selectTable.deptType" :placeholder="selectTable.deptType">
-                      <el-option
-                          v-for="item in options"
-                          :key="item.value"
-                          :label="item.label"
-                          :value="item.value">
-                      </el-option>
-                  </el-select>
-              </el-form-item>
-          </el-form>
-        <div slot="footer" class="dialog-footer">
-          <el-button @click="showDialog = false">取 消</el-button>
-          <el-button type="primary" @click="updateShop">确 定</el-button>
-        </div>
-      </el-dialog>
+      <el-dialog title="历史数据" v-model="showDialog">
+          <div class="table_container">
+            <el-table
+                :data="tableData2"
+                  style="width: 120%">
+              <el-table-column
+                label="数据时间"
+                prop="month">
+              </el-table-column>
+              <el-table-column
+                label="学习 成长"
+                prop="study">
+              </el-table-column>
+              <el-table-column
+                label="读书 指数"
+                prop="read">
+              </el-table-column>
+              <el-table-column
+                label="企业 文化"
+                prop="culture">
+              </el-table-column>
+              <el-table-column
+                label="出勤 指数"
+                prop="attendance">
+              </el-table-column>
+              <el-table-column
+                label="HSE"
+                prop="hse">
+              </el-table-column>
+              <el-table-column
+                label="精益 改善"
+                prop="improve">
+              </el-table-column>
+              <el-table-column
+                label="总指数"
+                prop="total">
+              </el-table-column>
+            </el-table>
+          </div>
+          <div slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="showDialog = false">关闭</el-button>
+          </div>
+        </el-dialog>
     </div>
   </div>
 </template>
 
 <script>
+import HeadTop from '../components/HeadTop'
 export default {
+  components: {
+    HeadTop
+  },
   data () {
     return {
       showDialog: false,
@@ -101,27 +125,27 @@ export default {
       pageSize: 15,
       currentPage: 1,
       tableData: [],
-      options: [{
-          value: '1',
-          label: '生成部门'
-      }, {
-          value: '2',
-          label: '非生产部门'
-      }],
-      selectTable: {deptType: '1'},
-      address: {}
+      selectTable: {},
+      tableData2: []
     }
   },
   created () {
     this.initData()
   },
-  components: {
-  },
   methods: {
     refreshDept () {
       this.$http.get('/huoli/wxData/refreshDept').then(({ data }) => {
-        if (data && data.errcode ===0) {
-
+        this.initData()
+        if (data && data > 0 ) {
+          this.$message({
+            type: 'success',
+            message: '现有部門' + data + '个'
+          })
+        }else if(data === 0 ){
+          this.$message({
+            type: 'success',
+            message: '没有部門在使用活力指数！'
+          })
         } else {
           this.$message({
             type: 'error',
@@ -157,42 +181,6 @@ export default {
     handleEdit (index, row) {
       this.selectTable = row
       this.showDialog = true
-    },
-    async handleDelete (index, row) {
-      const params = {}
-      params.id = row.id
-      this.$http.post('/org/deleteDept', params).then(({ data }) => {
-        this.$message({
-          type: 'success',
-          message: '删除成功'
-        })
-        this.initData()
-      })
-    },
-    async updateShop () {
-      this.showDialog = false
-      const params = {}
-      if(this.selectTable.id){
-        params.id = this.selectTable.id
-      }
-      if(this.selectTable.name){
-        params.name = this.selectTable.name
-      }
-      params.deptType = this.selectTable.deptType
-      this.$http.post('/org/saveDept', params).then(({ data }) => {
-        if (data) {
-          this.$message({
-            type: 'success',
-            message: '保存成功'
-          })
-          this.initData()
-        } else {
-          this.$message({
-            type: 'error',
-            message: data.message
-          })
-        }
-      })
     }
   }
 }

@@ -1,212 +1,182 @@
 <template>
     <div class="fillcontain">
-      <el-row style="margin-top: 20px;">
-        <el-col :span="14" :offset="4">
-          <header class="form_header">添加数据</header>
-          <el-form  label-width="110px" class="form food_form">
-            <el-form-item label="数据日期">
-              <el-select v-model="activityYear"  :placeholder="activityYear">
-                  <el-option
-                      v-for="item in years"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
-                  </el-option>
-              </el-select>
-              <el-select v-model="activityMonth" :placeholder="activityMonth">
-                  <el-option
-                      v-for="item in months"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
-                  </el-option>
-              </el-select>
-              <el-button type="primary" @click="addFood()">原数据计算</el-button>
-              <el-button type="primary" @click="addFood()">推送消息</el-button>
-            </el-form-item>
-          </el-form>
-        </el-col>
-      </el-row>
-        <div class="table_container">
+      <HeadTop></HeadTop>
+      <div class="table_container">
+        <el-table
+            :data="tableData"
+            style="width: 100%">
+            <el-table-column
+              label="数据时间"
+              prop="month">
+            </el-table-column>
+            <el-table-column
+              label="名称"
+              prop="name">
+            </el-table-column>
+            <el-table-column
+              label="上传时间"
+              prop="createDate">
+            </el-table-column>
+            <el-table-column label="操作" width="200">
+              <template slot-scope="scope">
+                <el-button
+                  size="mini"
+                  @click="handleEdit(scope.$index, scope.row)">查看数据</el-button>
+              </template>
+            </el-table-column>
+        </el-table>
+        <div class="Pagination">
+            <el-pagination
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+              :current-page="currentPage"
+              :page-size="pageSize"
+              layout="total, prev, pager, next"
+              :total="count">
+            </el-pagination>
+        </div>
+      </div>
+      <el-dialog title="详情" v-model="showDialog">
+          <div class="table_container">
             <el-table
-                :data="tableData"
-                style="width: 100%">
-                <el-table-column type="expand">
-                  <template slot-scope="props">
-                    <el-form label-position="left" inline class="demo-table-expand">
-                      <el-form-item label="店铺名称">
-                        <span>{{ props.row.name }}</span>
-                      </el-form-item>
-                      <el-form-item label="店铺地址">
-                        <span>{{ props.row.address }}</span>
-                      </el-form-item>
-                      <el-form-item label="店铺介绍">
-                        <span>{{ props.row.description }}</span>
-                      </el-form-item>
-                      <el-form-item label="店铺 ID">
-                        <span>{{ props.row.id }}</span>
-                      </el-form-item>
-                      <el-form-item label="联系电话">
-                        <span>{{ props.row.phone }}</span>
-                      </el-form-item>
-                      <el-form-item label="评分">
-                        <span>{{ props.row.rating }}</span>
-                      </el-form-item>
-                      <el-form-item label="销售量">
-                        <span>{{ props.row.recent_order_num }}</span>
-                      </el-form-item>
-                      <el-form-item label="分类">
-                        <span>{{ props.row.category }}</span>
-                      </el-form-item>
-                    </el-form>
-                  </template>
-                </el-table-column>
-                <el-table-column
-                  label="店铺名称"
-                  prop="name">
-                </el-table-column>
-                <el-table-column
-                  label="店铺地址"
-                  prop="address">
-                </el-table-column>
-                <el-table-column
-                  label="店铺介绍"
-                  prop="description">
-                </el-table-column>
-                <el-table-column label="操作" width="200">
-                  <template slot-scope="scope">
-                    <el-button
-                      size="mini"
-                      @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-                    <el-button
-                      size="mini"
-                      type="danger"
-                      @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-                  </template>
-                </el-table-column>
+                :data="tableData2"
+                  style="width: 120%">
+              <el-table-column
+                  label="姓名"
+                  prop="userName">
+              </el-table-column>
+              <el-table-column
+                label="号码"
+                prop="mobile" style="width: 200%">
+              </el-table-column>
+              <el-table-column
+                label="学习 成长"
+                prop="study">
+              </el-table-column>
+              <el-table-column
+                label="读书 指数"
+                prop="read">
+              </el-table-column>
+              <el-table-column
+                label="企业 文化"
+                prop="culture">
+              </el-table-column>
+              <el-table-column
+                label="出勤 指数"
+                prop="attendance">
+              </el-table-column>
+              <el-table-column
+                label="HSE"
+                prop="hse">
+              </el-table-column>
+              <el-table-column
+                label="精益 改善"
+                prop="improve">
+              </el-table-column>
+              <el-table-column
+                label="总指数"
+                prop="total">
+              </el-table-column>
             </el-table>
             <div class="Pagination">
                 <el-pagination
-                  @size-change="handleSizeChange"
-                  @current-change="handleCurrentChange"
-                  :current-page="currentPage"
-                  :page-size="20"
+                  @size-change="handleSizeChange2"
+                  @current-change="handleCurrentChange2"
+                  :current-page="currentPage2"
+                  :page-size="pageSize2"
                   layout="total, prev, pager, next"
-                  :total="count">
+                  :total="count2">
                 </el-pagination>
             </div>
-        </div>
+          </div>
+          <div slot="footer" class="dialog-footer">
+            <el-button @click="showDialog = false">关闭</el-button>
+          </div>
+        </el-dialog>
     </div>
 </template>
 
 <script>
+import HeadTop from '../components/HeadTop'
 export default {
+  components: {
+    HeadTop
+  },
   data () {
     return {
-      city: {},
-      offset: 0,
-      limit: 20,
+      showDialog: false,
+      pageSize: 20,
       count: 0,
       tableData: [],
       currentPage: 1,
       selectTable: {},
-      dialogFormVisible: false,
-      categoryOptions: [],
-      selectedCategory: [],
-      address: {},
-      months: [{
-          value: '01',
-          label: '01'
-      }, {
-          value: '02',
-          label: '02'
-      }, {
-          value: '03',
-          label: '03'
-      }, {
-          value: '04',
-          label: '04'
-      }, {
-          value: '05',
-          label: '05'
-      }, {
-          value: '06',
-          label: '06'
-      }, {
-          value: '07',
-          label: '07'
-      }, {
-          value: '08',
-          label: '08'
-      }, {
-          value: '09',
-          label: '09'
-      }, {
-          value: '10',
-          label: '10'
-      }, {
-          value: '11',
-          label: '11'
-      }, {
-          value: '12',
-          label: '12'
-      }],
-      activityMonth: '01',
-      years: [],
-      activityYear: ''
-
+      pageSize2: 10,
+      count2: 0,
+      tableData2: [],
+      currentPage2: 1
     }
   },
   created () {
     this.initData()
   },
-  components: {
-  },
   methods: {
-    async initData () {
-      try {
-        throw new Error('获取数据失败')
-        this.getResturants()
-      } catch (err) {
-        console.log('获取数据失败', err)
-      }
-    },
-    async getResturants () {
-      this.tableData = []
-      console.log('获取数据失败')
+    initData () {
+      const params = {}
+      params.start = (this.currentPage - 1) * this.pageSize
+      params.length = this.pageSize
+      this.$http.get('/huoli/data/fileDatagrid', {params: params}).then(({ data }) => {
+        if (data) {
+          this.tableData = data.rows
+          this.count = data.count
+        } else {
+          this.$message({
+            type: 'error',
+            message: data.message
+          })
+        }
+      })
     },
     handleSizeChange (val) {
-      console.log(`每页 ${val} 条`)
+      this.currentPage = val
+      this.initData()
     },
     handleCurrentChange (val) {
       this.currentPage = val
-      this.offset = (val - 1) * this.limit
-      this.getResturants()
+      this.initData()
     },
     handleEdit (index, row) {
-      this.selectTable = row
-      this.address.address = row.address
-      this.dialogFormVisible = true
-      this.selectedCategory = row.category.split('/')
-    },
-    async handleDelete (index, row) {
-      try {
-        console.log('删除成功')
-      } catch (err) {
-        this.$message({
-          type: 'error',
-          message: err.message
-        })
-        console.log('删除店铺失败')
+      if(!this.selectTable || this.selectTable.id !== row.id){
+        this.currentPage2 = 1
+        this.selectTable = row
+        this.getDetailInfo()
       }
+      this.showDialog = true
     },
-    async updateShop () {
-      this.dialogFormVisible = false
-      try {
-        console.log('更新餐馆信息失败!')
-      } catch (err) {
-        console.log('更新餐馆信息失败', err)
-      }
+    getDetailInfo() {
+      const params = {}
+      params.fileId = this.selectTable.id
+      params.start = (this.currentPage2 - 1) * this.pageSize2
+      params.length = this.pageSize2
+      //展示源数据
+      this.$http.get('/huoli/data/dataDataGrid', {params: params}).then(({ data }) => {
+        if (data) {
+          this.tableData2 = data.rows
+          this.count2 = data.count
+        } else {
+          this.$message({
+            type: 'error',
+            message: data.message
+          })
+        }
+      })
+    },
+    handleSizeChange2 (val) {
+      this.currentPage2 = val
+      this.getDetailInfo()
+    },
+    handleCurrentChange2 (val) {
+      this.currentPage2 = val
+      this.getDetailInfo()
     }
   }
 }

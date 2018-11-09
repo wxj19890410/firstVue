@@ -1,5 +1,6 @@
 <template>
     <div class="fillcontain">
+      <HeadTop></HeadTop>
       <el-row style="margin-top: 20px;">
         <el-col :span="14" :offset="1">
           <el-button type="primary" @click="refreshGroup()">更新班组</el-button>
@@ -49,11 +50,8 @@
               <template slot-scope="scope">
                 <el-button
                   size="mini"
-                  @click="handleEdit(scope.$index, scope.row)">查看人员</el-button>
-                <el-button
-                  size="mini"
-                  type="danger"
-                  @click="handleDelete(scope.$index, scope.row)">查看历史</el-button>
+                  disabled
+                  @click="handleHistory(scope.$index, scope.row)">查看历史</el-button>
               </template>
             </el-table-column>
         </el-table>
@@ -62,49 +60,92 @@
               @size-change="handleSizeChange"
               @current-change="handleCurrentChange"
               :current-page="currentPage"
-              :page-size="20"
+              :page-size="pageSize"
               layout="total, prev, pager, next"
               :total="count">
             </el-pagination>
         </div>
-        <el-dialog :title="selectTable.id?'编辑组名':'新建小组'" v-model="showDialog">
-          <el-form :model="selectTable">
-              <el-form-item label="小组名称" label-width="100px">
-                  <el-input v-model="selectTable.name" auto-complete="off"></el-input>
-              </el-form-item>
-          </el-form>
+        <el-dialog title="历史数据" v-model="showDialog">
+          <div class="table_container">
+            <el-table
+                :data="tableData2"
+                  style="width: 120%">
+              <el-table-column
+                label="数据时间"
+                prop="month">
+              </el-table-column>
+              <el-table-column
+                label="学习 成长"
+                prop="study">
+              </el-table-column>
+              <el-table-column
+                label="读书 指数"
+                prop="read">
+              </el-table-column>
+              <el-table-column
+                label="企业 文化"
+                prop="culture">
+              </el-table-column>
+              <el-table-column
+                label="出勤 指数"
+                prop="attendance">
+              </el-table-column>
+              <el-table-column
+                label="HSE"
+                prop="hse">
+              </el-table-column>
+              <el-table-column
+                label="精益 改善"
+                prop="improve">
+              </el-table-column>
+              <el-table-column
+                label="总指数"
+                prop="total">
+              </el-table-column>
+            </el-table>
+          </div>
           <div slot="footer" class="dialog-footer">
-            <el-button @click="showDialog = false">取 消</el-button>
-            <el-button type="primary" @click="updateShop">确 定</el-button>
+            <el-button type="primary" @click="showDialog = false">关闭</el-button>
           </div>
         </el-dialog>
       </div>
     </div>
 </template>
 <script>
+import HeadTop from '../components/HeadTop'
 export default {
+  components: {
+    HeadTop
+  },
   data () {
     return {
       showDialog: false,
       offset: 0,
-      limit: 20,
+      pageSize: 20,
       count: 0,
       tableData: [],
       currentPage: 1,
       selectTable: {},
-      address: {}
+      tableData2:{}
     }
   },
   created () {
     this.initData()
   },
-  components: {
-  },
   methods: {
     refreshGroup () {
       this.$http.get('/huoli/wxData/refreshTag').then(({ data }) => {
-        if (data && data.errcode ===0) {
-
+        this.initData()
+        if (data && data >= 0 ) {
+          this.$message({
+            type: 'success',
+            message: '现有班组' + data + '个'
+          })
+        }else if (data === 0 ) {
+          this.$message({
+            type: 'error',
+            message: '现有没有班组!'
+          })
         } else {
           this.$message({
             type: 'error',
@@ -115,8 +156,8 @@ export default {
     },
     async initData () {
       const params = {}
-      params.start = 0
-      params.length = 10
+      params.start = (this.currentPage - 1) * this.pageSize
+      params.length = this.pageSize
       this.$http.get('/huoli/org/groupDataGrid', {params: params}).then(({ data }) => {
         if (data) {
           this.tableData = data.rows
@@ -129,57 +170,17 @@ export default {
         }
       })
     },
-    async getResturants () {
-      this.tableData = []
-      console.log('获取数据失败')
-    },
     handleSizeChange (val) {
-      console.log(`每页 ${val} 条`)
+      this.currentPage = val
+      this.initData()
     },
     handleCurrentChange (val) {
       this.currentPage = val
-      this.offset = (val - 1) * this.limit
-      this.getResturants()
+      this.initData()
     },
-    handleEdit (index, row) {
-      this.selectTable = row
+    handleHistory (index, row) {
+      this.selectTable = val
       this.showDialog = true
-    },
-    async handleDelete (index, row) {
-      console.log(row)
-      const params = {}
-      params.id = row.id
-      this.$http.post('/org/deleteGroup', params).then(({ data }) => {
-        this.$message({
-          type: 'success',
-          message: '删除成功'
-        })
-        this.initData()
-      })
-    },
-    async updateShop () {
-      this.showDialog = false
-      const params = {}
-      if(this.selectTable.id){
-        params.id = this.selectTable.id
-      }
-      if(this.selectTable.name){
-        params.name = this.selectTable.name
-      }
-      this.$http.post('/org/saveGroup', params).then(({ data }) => {
-        if (data) {
-          this.$message({
-            type: 'success',
-            message: '保存成功'
-          })
-          this.initData()
-        } else {
-          this.$message({
-            type: 'error',
-            message: data.message
-          })
-        }
-      })
     }
   }
 }

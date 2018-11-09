@@ -12,7 +12,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
         '/huoli': {
-            target: 'http://www.whchlor-alkali.com:8083',
+            target: 'http://localhost:8083/',
             changeOrigin: true,
             pathRewrite: {
                 '^/huoli': '/huoli'

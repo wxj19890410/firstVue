@@ -1,22 +1,34 @@
 <template>
   <div>
+    <HeadTop></HeadTop>
     <el-row style="margin-top: 20px;">
   		<el-col :span="14" :offset="4">
   			<header class="form_header">添加数据</header>
   			<el-form  label-width="110px" class="form food_form">
-  				<el-form-item label="上传Excel">
+  				<el-form-item label="选择月份">
+            <el-select v-model="month" @change="monthChange" placeholder="请选择" >
+                <el-option
+                    v-for="item in selectMonths"
+                    :key="item"
+                    :label="item"
+                    :value="item">
+                </el-option>
+            </el-select>
   					<el-upload
   					  class="avatar-uploader"
   					  :action="uploadUrl"
   					  :show-file-list="false"
   					  :on-success="uploadImg"
               :headers="headers"
+              :data="upLoadData"
   					  :before-upload="beforeImgUpload">
-  					  <i>上传图片</i>
+  					  <i>上传Excel</i>
   					</el-upload>
+
   				</el-form-item>
           <el-form-item label="数据操作">
-            <el-button type="primary" @click="setResultData()">发布</el-button>
+            <el-button type="primary" @click="setResultData()">计算</el-button>
+            <el-button type="primary" @click="showDialog = true">推送消息</el-button>
   					<!-- <el-button type="primary" @click="addFood()">推送消息</el-button> -->
   				</el-form-item>
   			</el-form>
@@ -72,14 +84,31 @@
             </div>
         </div>
     </div>
+    <el-dialog title="人员详情" v-model="showDialog">
+      <el-form>
+        <el-form-item label="人员信息" label-width="100px">
+            <el-input v-model='content'></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="sendMsg">发送</el-button>
+        <el-button @click="showDialog = false">取消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
+import HeadTop from '../components/HeadTop'
 export default {
+  components: {
+    HeadTop
+  },
   data () {
     return {
-	    uploadUrl: 'http://www.whchlor-alkali.com:8083/huoli/file/upload',
+      content:'上月活跃指数已发发布',
+      upLoadData: {},
+	    uploadUrl: 'http://localhost:8083/huoli/file/upload',
       headers: {
         loginUuid: this.$service.localStorage.get('loginUuid')
       },
@@ -89,20 +118,65 @@ export default {
       tableData: [],
       pageSize: 10,
       currentPage: 1,
-      selectTable: {}
+      selectTable: {},
+      selectMonths: [],
+      month: null,
+      showDialog: false
     }
   },
-  components: {
-  },
   created () {
+    this.months()
     this.getResturants()
   },
   methods: {
+    sendMsg(){
+      const params = {}
+      params.content = this.content
+      //展示源数据
+      this.$http.get('/huoli/mobile/sendMsg', {params: params}).then(({ data }) => {
+        if (data) {
+          this.$message({
+            type: 'success',
+            message: '发送成功'
+          })
+        } else {
+          this.$message({
+            type: 'error',
+            message: data.message
+          })
+        }
+      })
+    },
+    monthChange(){
+      this.upLoadData.month = this.month
+      this.getResturants()
+    },
+    months(){
+      let now = new Date()
+      let yearData = now.getFullYear()
+      let monthData = now.getMonth()+1
+      this.month = yearData + "-" + monthData
+      this.upLoadData.month = this.month
+      this.selectMonths.push(this.month)
+      for(let i = 1; i < 12; i++){
+        let t = monthData-i
+        if( t > 0 ){
+          this.selectMonths.push(yearData + "-" + t)
+        } else if( monthData === 0 ){
+          this.selectMonths.push(yearData-1 + "-" + (12+t))
+        } else {
+          this.selectMonths.push(yearData-1 + "-" + (12+t))
+        }
+      }
+
+    },
     getResturants() {
       const params = {}
-      //params.month = this.sysFile.month
+      params.month = this.month
       // params.fileId = this.sysFile.id
-      params.fileId = 13
+      /*if(this.sysFile && this.sysFile.id){
+         params.fileId = this.sysFile.id
+      }*/
       params.start = (this.currentPage - 1) * this.pageSize
       params.length = this.pageSize
       //展示源数据
@@ -145,11 +219,14 @@ export default {
     },
     setResultData(){
       const params = {}
-      params.month = '2018-11'
+      params.month = this.month
       //展示处理数据
       this.$http.get('/huoli/data/setAverageData', {params: params}).then(({ data }) => {
         if (data) {
-          console.log(data)
+          this.$message({
+            type: 'success',
+            message: '计算成功'
+          })
         } else {
           this.$message({
             type: 'error',
@@ -158,9 +235,6 @@ export default {
         }
       })
     },
-
-
-
     addFood () {
     },
     selectActivity(){

@@ -1,5 +1,6 @@
 <template>
     <div class="fillcontain">
+        <HeadTop></HeadTop>
         <div class="table_container">
           <el-table
               :data="tableData"
@@ -24,7 +25,7 @@
                 <template slot-scope="scope">
                   <el-button
                     size="mini"
-                    @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                    @click="handleEdit(scope.$index, scope.row)">历史指数</el-button>
                 </template>
               </el-table-column>
           </el-table>
@@ -52,21 +53,25 @@
           <div class="table_container">
             <el-table
                 :data="tableData2"
-                  style="width: 100%">
+                  style="width: 120%">
               <el-table-column
-                label="学习成长"
+                label="时间"
+                prop="month">
+              </el-table-column>
+              <el-table-column
+                label="学习 成长"
                 prop="study">
               </el-table-column>
               <el-table-column
-                label="读书指数"
+                label="读书 指数"
                 prop="read">
               </el-table-column>
               <el-table-column
-                label="企业文化"
+                label="企业 文化"
                 prop="culture">
               </el-table-column>
               <el-table-column
-                label="出勤指数"
+                label="出勤 指数"
                 prop="attendance">
               </el-table-column>
               <el-table-column
@@ -74,7 +79,7 @@
                 prop="hse">
               </el-table-column>
               <el-table-column
-                label="精益改善"
+                label="精益 改善"
                 prop="improve">
               </el-table-column>
               <el-table-column
@@ -93,15 +98,19 @@
                 </el-pagination>
             </div>
           </div>
-        <div slot="footer" class="dialog-footer">
-          <el-button @click="showDialog = false">关闭</el-button>
-        </div>
-      </el-dialog>
+          <div slot="footer" class="dialog-footer">
+            <el-button @click="showDialog = false">关闭</el-button>
+          </div>
+        </el-dialog>
     </div>
 </template>
 
 <script>
+import HeadTop from '../components/HeadTop'
 export default {
+  components: {
+    HeadTop
+  },
   data () {
     return {
       count: 0,
@@ -114,13 +123,11 @@ export default {
       count2: 0,
       pageSize2: 10,
       currentPage2: 1,
-      tableData2: [],
+      tableData2: []
     }
   },
   created () {
     this.initData()
-  },
-  components: {
   },
   methods: {
     getUserInfo() {

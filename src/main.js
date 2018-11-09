@@ -21,7 +21,7 @@ Vue.http.options.emulateJSON = true
 Vue.http.interceptors.push((request, next) => {
   // console.log(window.GLOBLE.apiUrl)
   // request.url = window.GLOBLE.apiUrl + request.url
-  request.headers.set('Content-Type', 'application/json')
+  // request.headers.set('Content-Type', 'application/json')
   request.headers.set('loginUuid', service.localStorage.get('loginUuid'))
   if (request.method === 'POST' && request.body) {
     var params = {}
@@ -44,16 +44,17 @@ Vue.http.interceptors.push((request, next) => {
     if (response.status === 200) {
       result.data = response.body
     } else {
-      if (response.body.message === 'NotLogedInException') {
-        this.$message({
-          type: 'false',
+      if (response.body.message === 'not loged in') {
+        Vue.prototype.$message({
+          type: 'error',
           message: '请登录用户'
         })
         store.commit('setUserInfo')
-        router.push('/login')
-      } else if (response.body.message) {
+        router.push('/')
+      } else if (response.body.error) {
+        result.data = response.body/*
         result.error = response.body.error
-        result.message = response.body.message
+        result.message = response.body.message*/
       }
     }
     result.response = response
